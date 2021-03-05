@@ -1,10 +1,10 @@
 import csv #lets us read csv files
-#import os geodist
+import os, geodist
 
-# All code will be on one file for now, will split each functions into modules later when I can get everything working here
+# All code will be on one file for now, will split each function into modules later when I can get everything working here
 
 PS_filename = 'postcodes.csv'
-crime_folder = 'Devon_and_Cornwall_crime_data_2020'
+crime_folder = '/Devon_and_Cornwall_crime_data_2020/'
 
 def get_crime(user_postcode):
     """ This function retrives all repoerted street level within a radius of the centre coordinate """
@@ -17,8 +17,32 @@ def get_crime(user_postcode):
             print(f"Accepted radius = {radius}")
             accepted = True
 
-    #with open()
-        #assert radius in accept_radius, "Please enter a radius of 1, 2 or 5 (in km)"
+    #TODO Test for if file exists etc. Tests
+
+    # Retrieving all repoerte street level crime. It is not sorted yet. Neither is it confined to the allowed radius. It just prints everything for now.
+    #Finding our current directory and the directory with crime data
+    cur_path = os.path.dirname(__file__)
+    target_path = cur_path + crime_folder
+    exists = os.path.isdir(target_path)
+
+    # If target path exsits, loop through each file in the directory
+    if exists: # Aka if exists == True
+        for root,dirs,files in os.walk(target_path):
+            for file in files:
+                #Making a variable to open each csv. Using the path and the file name
+                access_file = target_path + file
+                print(access_file)
+
+                #Now, we are openning the file.
+                with open(access_file, 'r') as cur_file:
+                    csv_reader = csv.reader(cur_file)
+                    next(csv_reader)
+
+                    for line in csv_reader:
+                        print(line)
+                    #print(cur_file)
+                    #  perform calculation
+
 
 def get_coordinates(user_postcode):
     """This function retrieves the centre coordinates (latitude or longitude) of a postcode"""
@@ -60,11 +84,3 @@ def menu():
 
 menu()
 
-
-# For future use
-# dir = os.path.relpath('.\\Devon_and_Cornwall_crime_data_2020\\2020-01-devon-and-cornwall-street.csv')
-# with open(dir, 'r') as f:
-#     read = csv.reader(f)
-#
-#     for i in read:
-#         print(i)
