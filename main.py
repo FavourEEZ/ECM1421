@@ -1,13 +1,14 @@
-import csv #lets us read csv files
-import os, geodist
+import csv,os  #csv lets us read csv files. os lets us execute files in our directory easily
+from geodist import distance
 
 # All code will be on one file for now, will split each function into modules later when I can get everything working here
 
 PS_filename = 'postcodes.csv'
 crime_folder = '/Devon_and_Cornwall_crime_data_2020/'
 
-def get_crime(user_postcode):
+def get_crime(user_postcode, coordinate):
     """ This function retrives all repoerted street level within a radius of the centre coordinate """
+    crime_radius = [] #This array holds the distance of reported crime under a specified radius and sorts it
     accepted = False
     # This while loopr repeats until user types a radius of 1, 2 or 5 (as stated in the pdf)
     while accepted == False:
@@ -19,7 +20,7 @@ def get_crime(user_postcode):
 
     #TODO Test for if file exists etc. Tests
 
-    # Retrieving all repoerte street level crime. It is not sorted yet. Neither is it confined to the allowed radius. It just prints everything for now.
+    # Retrieving all reported street level crime. It is not sorted yet. Neither is it confined to the allowed radius. It just prints everything for now.
     #Finding our current directory and the directory with crime data
     cur_path = os.path.dirname(__file__)
     target_path = cur_path + crime_folder
@@ -39,12 +40,33 @@ def get_crime(user_postcode):
                     next(csv_reader)
 
                     for line in csv_reader:
-                        print(line)
-                    #print(cur_file)
-                    #  perform calculation
+                        #Use lat and lont to check distance
+
+                        crime_latitude, crime_longitude = line[5], line[4]
+                        try:
+                            current_crime_location = (float(crime_latitude), float(crime_longitude)) #Creating a tuple to be able to call geodist.py function
+                            #print(coordinate, current_crime_location)
+                            print(line)
+                            # Calling geodist method to retrieve the distance between the person's postcode and the postcode of each crime occurence
+                            #d = distance(coordinate, current_crime_location)
+                            #if d <= radius:
+                            #    crime_radius.append(radius)
+                            #Using d (distance) to sort and d as its key possibly, sort the distance using a dictionary?
+                        except:
+                            pass
+            break
+                        #There are crimes with no registered location!
+
+                        #only print within the radius
+
+                        #check distance for all values, only append allowed distance to a list e.g. Print list from lowest to highest
+                        #Sort by distance from postcode
+                        #print(line)
 
 
 def get_coordinates(user_postcode):
+    #Temporarily making them global. After modularisation, I will import to access the variables
+
     """This function retrieves the centre coordinates (latitude or longitude) of a postcode"""
     #TODO Try and except needed for postcode validation
 
@@ -62,9 +84,9 @@ def get_coordinates(user_postcode):
             if line[0] == user_postcode:
                 latitude, longitude = line[-2], line[-1] #list[-1] and line[-1] takes the last 2 values in a list. Which is conviniently the longitude and latitude
                 print(f"Latitude: {latitude}, Longitude {longitude}")
+                location = (float(latitude), float(longitude))
 
-                return latitude, longitude    #When this is split into modules, this variable will be useful.
-    # Do you need to close "with open" files?!
+                return location    #When this is split into modules, this variable will be useful.
 
 
 def menu():
@@ -78,9 +100,9 @@ def menu():
         postcode = input("Please enter a Postcode")
         #TODO validate postcode.
 
-        get_coordinates(postcode)
+        coordinate = get_coordinates(postcode)
 
-        get_crime(postcode)
+        get_crime(postcode, coordinate)
 
 menu()
 
