@@ -1,4 +1,4 @@
-import csv,os  #csv lets us read csv files. os lets us execute files in our directory easily
+import csv,os, time  #csv lets us read csv files. os lets us execute files in our directory easily. Time allows us to use time/date in our program
 from geodist import distance
 
 # All code will be on one file for now, will split each function into modules later when I can get everything working here
@@ -9,8 +9,8 @@ PS_filename = 'postcodes.csv'
 crime_folder = '/Devon_and_Cornwall_crime_data_2020/'
 
 def write_distance(sorted_data, filename):
+    """This function creates (writes to) a new user defined file"""
     header = ["Crime ID", "Month", "Reported by", "Falls within", "Longitude", "Latitude", "Location", "LSOA code", "LSOA name", "Crime type", "Last outcome category", "Context", "Distance"]
-    print("Writing to file")
     # Write Values to file
     filename = filename+".csv"
     try:
@@ -18,16 +18,18 @@ def write_distance(sorted_data, filename):
             csv_writer = csv.writer(new_file)
             csv_writer.writerow(header)
             csv_writer.writerows(sorted_data)
+            print("A new file has been created!")
     except:
-        print("An error occured while opening the file.Please check if the file is opened else")
+        print("An error occured while opening the file. Please check if the file is opened else")
 
 
-def get_crime(user_postcode, coordinate, user_choice):
-    """ This function retrives all repoerted street level within a radius of the centre coordinate """
+def get_crime(coordinate, user_choice):
+    """ This function retrives all reported street level within a radius of the centre coordinate """
     sort_radius = []
     accepted = False
     # This while loop repeats until user types a radius of 1, 2 or 5 (as stated in the pdf)
     while accepted == False:
+        #TODO Add, restart, quit function
         radius = int(input("Please enter an integer to search for crimes (Either 1, 2 or 5km): "))
         accept_radius = [1, 2, 5]
         if radius in accept_radius:
@@ -35,8 +37,6 @@ def get_crime(user_postcode, coordinate, user_choice):
             accepted = True
         else:
             print(f"{radius} IS NOT ACCEPTED. Please try 1, 2 or 5km")
-
-    #TODO Test for if file exists etc. Tests
 
     #Finding our current directory and the directory with crime data
     cur_path = os.path.dirname(__file__)
@@ -51,7 +51,9 @@ def get_crime(user_postcode, coordinate, user_choice):
                 access_file = target_path + file
                 print(access_file)
 
-                #Now, we are openning the file.
+                #TODO pass the input choice here and do your ifs and elifs. Then create a function for each type of retrieval.
+                #TODO Only open csv files!
+                #Now, we are opening the file.
                 with open(access_file, 'r') as cur_file:
                     csv_reader = csv.reader(cur_file)
                     next(csv_reader)
@@ -60,18 +62,22 @@ def get_crime(user_postcode, coordinate, user_choice):
                         crime_latitude, crime_longitude = line[5], line[4]
                         try:
                             current_crime_location = (float(crime_latitude), float(crime_longitude)) #Creating a tuple to be able to call geodist.py function
-                            #print(coordinate, current_crime_location)
 
-                            # Calling geodist method to retrieve the distance between the person's postcode and the postcode of each crime occurence
+                            # Calling geodist method to retrieve the distance between the person's postcode and the postcode of each crime occurence.
+                            #Geodist (local) module returns d. D is the distance between the postcode the user entered and the postcode in each csv file.
                             d = distance(coordinate, current_crime_location)
                             if d <= radius:
                                 line.append(d)
                                 sort_radius.append(line) #Adding this each returned line from the csv into an array so we can sort it. This makes a 2D array.
-                            #Using d (distance) to sort and d as its key possibly, sort the distance using a dictionary?
                         except:
                             pass
             sort_radius = sorted(sort_radius, key=lambda sorted_radius:sorted_radius[12])
             return sort_radius
+    else:
+        print("You don't seem to have the folder/files required to retrieve the crime")
+        time.sleep(2) #Program waits 2 seconds then prints the next statement
+        print("If you do, please make a folder called: '/Devon_and_Cornwall_crime_data_2020/' and only put the crime csv data files there")
+        menu()
 
 def get_coordinates(user_postcode):
     """This function retrieves the centre coordinates (latitude or longitude) of a postcode"""
@@ -102,26 +108,21 @@ def menu():
     #TODO whenever program prompt for user input, it must always accept the options of quit and restart.
 
     while True:
-        #Todo Display menu!
-        #User enters postcode
-        postcode = input("Please enter a Postcode: ")
-        #TODO validate postcode.
-
-        coordinate = get_coordinates(postcode)
-
         #Menu: Distance, date, crime category
-        user_choice = input("""How would you like the data sorted. Please enter the number you would like to select:
+        #TODO Add restart, quit etc, Validate the number
+        user_choice = input("""Hello, welcome to the Crime Data search tool.
+How would you like the data sorted. Please enter the number you would like to select:
         1.Distance (nearest first)
         2.Date (most recent first)
         3.Crime Category 
-        : """)
+            > """)
 
-        if user_choice == "1":
-            sorted_data = get_crime(postcode, coordinate, user_choice)
-        elif user_choice == "2":
-            pass
-        elif user_choice == "3":
-            pass
+        #TODO validate postcode to exist in the file, add a space in the middle. Caps everuthing for user.
+        postcode = input("Please enter a Postcode: ")
+        coordinate = get_coordinates(postcode)
+
+        #Sorting the data, then retrieving it
+        sorted_data = get_crime(coordinate, user_choice)
 
         filename = input("What would you like to call your report? : ")
         write_distance(sorted_data, filename)
