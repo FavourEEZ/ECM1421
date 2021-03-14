@@ -1,7 +1,6 @@
 import csv,os, time  #csv lets us read csv files. os lets us execute files in our directory easily. Time allows us to use time/date in our program
 from geodist import distance
 
-
 #TODO Do testing for geodist.py
 #TODO Assert statements?!
 #TODO Move radius userinput from get_crime to menu
@@ -18,7 +17,7 @@ def write_distance(sorted_data, filename):
             csv_writer = csv.writer(new_file)
             csv_writer.writerow(header)
             csv_writer.writerows(sorted_data)
-            print("A new file has been created at:", "\n")
+            print("A new file has been created!", "\n")
     except:
         print("An error occured while opening the file. Please check if the file is opened else")
 
@@ -121,16 +120,34 @@ def get_coordinates(user_postcode):
                 return location
 
 
-def verify_postcode():
-    pass
+def verify_postcode(postcode):
+    """This function opens postcodes.csv and checks if the user entered postcode exists"""
+    accepted = False
+    accepted_list = []
+    # This while loop repeats until user types a radius of 1, 2 or 5 (as stated in the pdf)
+
+    while accepted == False:
+        with open(PS_filename, 'r') as postcode_csv:
+            #using the reader method to read csv file. Pass file into method.
+            csv_reader = csv.reader(postcode_csv)
+            next(csv_reader) #ignores the first line
+            #Each row becomes a list. Line[0] is the first column that holds the postcode for each row.
+            for line in csv_reader:
+                if line[0] == postcode:
+                    accepted_list.append(line[0])
+                else: pass
+        if postcode in accepted_list:
+            return postcode
+        else:
+            print("***", postcode, "was not accepted. Please enter an accepted postcode in all caps and a space between incode 'DT1' and outcode '1AD'"
+                            "\n" "Please try again" "\n")
+            menu()
+
 
 def menu():
     """This function acts as the CLI for the user"""
-    #TODO whenever program prompt for user input, it must always accept the options of quit and restart.
-
     while True:
         #Menu: Distance, date, crime category
-        #TODO Add restart, quit etc, Validate the number
         user_choice = input("""Hello, welcome to the Crime Data search tool.
 How would you like the data sorted. Please enter the number you would like to select:
         1.Distance (nearest first)
@@ -140,14 +157,21 @@ How would you like the data sorted. Please enter the number you would like to se
         5.Quit - Ends the whole program
             > """)
         if user_choice == "1" or user_choice == "2" or user_choice == "3":
-            print("Throughtout the program you can enter 'restart' or 'quit'")
-            time.sleep(1.25)
-            #TODO validate postcode to exist in the file, add a space in the middle. Caps everuthing for user.
-            #TODO Add an option for quit, restart
-            postcode = input("Please enter a Postcode: ")
-            #verified = verify_postcode(postcode)
+            print("Throughtout the program you can enter 'restart' or 'quit' when prompted to input")
+            time.sleep(0.5)
 
-            coordinate = get_coordinates(postcode)
+            postcode = input("Please enter a Postcode > ")
+            #Adding the quit and restart options for the user
+            if postcode == "quit":
+                print("Program has ended (postcode)")
+                user_choice = 5
+                break
+            elif postcode == "restart":
+                menu()
+            else: pass
+
+            verified_postcode = verify_postcode(postcode) #Verifying the coordinates by
+            coordinate = get_coordinates(verified_postcode)
 
             #Sorting the data, then retrieving it
             sorted_data = get_crime(coordinate, user_choice)
@@ -161,8 +185,7 @@ How would you like the data sorted. Please enter the number you would like to se
 
         elif user_choice == "5": #quit
             print("Program has ended")
-            break
-
+            exit(0)
 
 
 menu()
