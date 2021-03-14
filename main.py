@@ -1,9 +1,8 @@
 import csv,os, time  #csv lets us read csv files. os lets us execute files in our directory easily. Time allows us to use time/date in our program
 from geodist import distance
 
-#TODO Do testing for geodist.py
-#TODO Assert statements?!
-#TODO Move radius userinput from get_crime to menu
+#TODO Do testing & Assert statements for geodist.py
+#TODO Modularise all code
 PS_filename = 'postcodes.csv'
 crime_folder = '/Devon_and_Cornwall_crime_data_2020/'
 
@@ -22,22 +21,11 @@ def write_distance(sorted_data, filename):
         print("An error occured while opening the file. Please check if the file is opened else")
 
 
-def get_crime(coordinate, user_choice):
+def get_crime(coordinate, user_choice, radius):
     """ This function retrives all reported street level within a radius of the centre coordinate """
     sort_radius = []
     sort_date = []
     sort_category = []
-    accepted = False
-    # This while loop repeats until user types a radius of 1, 2 or 5 (as stated in the pdf)
-    while accepted == False:
-        #TODO Add, restart, quit function for user input
-        radius = int(input("Please enter an integer to search for crimes (Either 1, 2 or 5km): "))
-        accept_radius = [1, 2, 5]
-        if radius in accept_radius:
-            print(f"Accepted radius = {radius}")
-            accepted = True
-        else:
-            print(f"{radius} IS NOT ACCEPTED. Please try 1, 2 or 5km")
 
     #Finding our current directory and the directory with crime data
     cur_path = os.path.dirname(__file__)
@@ -148,13 +136,13 @@ def menu():
     """This function acts as the CLI for the user"""
     while True:
         #Menu: Distance, date, crime category
-        user_choice = input("""Hello, welcome to the Crime Data search tool.
+        user_choice = input("\n" """Hello, welcome to the Crime Data search tool.
 How would you like the data sorted. Please enter the number you would like to select:
         1.Distance (nearest first)
         2.Date (most recent first)
         3.Crime Category 
-        4.Restart - Restarts the program 
-        5.Quit - Ends the whole program
+        4.restart - Restarts the program 
+        5.quit - Ends the whole program
             > """)
         if user_choice == "1" or user_choice == "2" or user_choice == "3":
             print("Throughtout the program you can enter 'restart' or 'quit' when prompted to input")
@@ -163,8 +151,8 @@ How would you like the data sorted. Please enter the number you would like to se
             postcode = input("Please enter a Postcode > ")
             #Adding the quit and restart options for the user
             if postcode == "quit":
-                print("Program has ended (postcode)")
-                user_choice = 5
+                print("Program has ended")
+                user_choice = 5 #Assigning user_choice to 5 so that the elif to quit the program gets called.
                 break
             elif postcode == "restart":
                 menu()
@@ -174,18 +162,45 @@ How would you like the data sorted. Please enter the number you would like to se
             coordinate = get_coordinates(verified_postcode)
 
             #Sorting the data, then retrieving it
-            sorted_data = get_crime(coordinate, user_choice)
+            #Error Handling for radius. It includes 'restart' and 'quit' condition.
+            accepted = False
+            # This while loop repeats until user types a radius of 1, 2 or 5 (as stated in the pdf)
+            while accepted == False:
 
-            #TODO Add an option for quit, restart
+                radius = input("Please enter an integer to search for crimes (Either 1, 2 or 5km): ")
+                accept_radius = ["1", "2", "5"]
+                if radius in accept_radius:
+                    print(f"{radius} is accepted!")
+                    accepted = True
+
+                elif radius == "restart":
+                    print("Radius restart")
+                    menu()
+                elif radius == "quit":
+                    print("Program has ended")
+                    exit(0) #This ends the program
+                else:
+                    print(f"{radius} IS NOT ACCEPTED an accepted radius. Please try 1, 2 or 5km")
+
+
+            sorted_data = get_crime(coordinate, user_choice, int(radius))
+
             filename = input("What would you like to call your report? : ")
+            if filename == "restart":
+                menu()
+            elif filename == "quit":
+                print("Program has ended")
+                exit(0) #This ends the program
+            else: pass
             write_distance(sorted_data, filename)
 
-        elif user_choice == "4": #restarts the program
+        elif user_choice == "4": #restart
+            print("Program has restarted")
             menu()
 
         elif user_choice == "5": #quit
             print("Program has ended")
-            exit(0)
+            exit(0) #This ends the program
 
 
 menu()
