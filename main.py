@@ -51,7 +51,7 @@ How would you like the data sorted. Please enter the number you would like to se
                     accepted = True
 
                 elif radius == "restart":
-                    print("Radius restart")
+                    print("Program has been restarted")
                     menu()
                 elif radius == "quit":
                     print("Program has ended")
@@ -73,7 +73,7 @@ How would you like the data sorted. Please enter the number you would like to se
             fileWriting.write_distance(sorted_data, filename)
 
         elif user_choice == "4": #restart
-            print("Program has restarted")
+            print("Program has been restarted")
             menu()
 
         elif user_choice == "5": #quit

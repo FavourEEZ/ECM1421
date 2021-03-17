@@ -13,16 +13,23 @@ def verify_postcode(postcode):
             next(csv_reader) #ignores the first line
             #Each row becomes a list. Line[0] is the first column that holds the postcode for each row.
             for line in csv_reader:
-                if line[0] == postcode:
+                match = line[0]
+                if match == postcode:
                     #Adding the accpeted postcode into a list. We then check if the user input postcode is in the list.
                     accepted_list.append(line[0])
-                else: pass
+                    #Elif the 4 chraacter from the end is not an empty string, we
+                elif match[-4] != " ":
+                    match = match[:-3] + " " + match[-3:]
+                    if match == postcode:
+                        postcode = line[0]
+                        accepted_list.append(line[0])
+
         if postcode in accepted_list:
-            print("Postcode accepted")
+            print("postcode is accepted")
             return postcode
         else:
             #Else, an error message gets printed out to the user and they get prompted to the menu
             print("***", postcode, "was not accepted. Please enter an accepted postcode in all caps and a space between incode 'DT1' and outcode '1AD'"
-                                   "\n" "Please try again" "\n")
+                                   "\n" "Please try again")
             from main import menu
             menu()
