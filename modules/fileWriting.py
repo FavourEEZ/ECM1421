@@ -9,6 +9,6 @@ def write_distance(sorted_data, filename):
             csv_writer = csv.writer(new_file)
             csv_writer.writerow(header)
             csv_writer.writerows(sorted_data)
-            print("A new file has been created!", "\n")
+            print(f"{filename} has been created!", "\n")
     except:
         print("An error occured while opening the file. Please check if the file is opened else", "\n")
