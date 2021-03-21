@@ -27,8 +27,7 @@ How would you like the data sorted. Please enter the number you would like to se
             #Adding the quit and restart options for the user
             if postcode == "quit":
                 print("Program has ended")
-                user_choice = 5 #Assigning user_choice to 5 so that the elif to quit the program gets called.
-                break
+                exit(0)
             elif postcode == "restart":
                 menu()
             elif postcode == "":
@@ -88,7 +87,7 @@ How would you like the data sorted. Please enter the number you would like to se
 
         elif user_choice == "5": #quit
             print("Program has ended")
-            quit() #This ends the program
+            exit(0) #This ends the program
 
 
 menu()
