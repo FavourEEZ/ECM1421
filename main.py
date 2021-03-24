@@ -27,8 +27,7 @@ How would you like the data sorted. Please enter the number you would like to se
             #Adding the quit and restart options for the user
             if postcode == "quit":
                 print("Program has ended")
-
-               exit(0)
+                exit(0)
             elif postcode == "restart":
                 menu()
             else: pass
