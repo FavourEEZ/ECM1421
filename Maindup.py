@@ -64,7 +64,7 @@ How would you like the data sorted. Please enter the number you would like to se
                     menu()
                 elif radius == "quit":
                     print("Program has ended")
-                    exit(0) #This ends the program
+                    quit(0) #This ends the program
                 else:
                     print(f"{radius} IS NOT ACCEPTED an accepted radius. Please try 1, 2 or 5km")
 
@@ -87,7 +87,7 @@ How would you like the data sorted. Please enter the number you would like to se
 
         elif user_choice == "5": #quit
             print("Program has ended")
-            exit(0) #This ends the program
+            quit(0) #This ends the program
 
 
 menu()
